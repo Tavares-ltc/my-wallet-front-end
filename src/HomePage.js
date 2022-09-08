@@ -1,8 +1,7 @@
 import styled from 'styled-components';
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
-
-export default function HomePage({ type }) {
+export default function HomePage({ type, setUserName }) {
     const [loginData, setLoginData] = useState({ email: '', password: '' })
     const [signUpData, setSignUpData] = useState({name:'', email: '', password: ''})
     const [hover, setHover] = useState(false)
@@ -48,6 +47,7 @@ export default function HomePage({ type }) {
         event.preventDefault();
         if(type === 'sign-in') {
          console.log(loginData)
+         setUserName(loginData.name)
         //    navigate('/mywallet')
     } else {
             //verificar se as senhas são iguais
@@ -100,12 +100,16 @@ flex-direction: column;
 justify-content: center;
 align-items: center;
 input{
+    box-sizing: border-box;
+    padding-left: 10px;
     height: 50px;
     border-radius: 10px;
     border-style: none;
     margin-top: 20px;
     width: 100%;
     font-size: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+    
     &:focus{
  outline: 2px solid #21bb57; 
     }
@@ -121,13 +125,15 @@ button {
     font-size: 20px;
     font-weight: 700;
     cursor : pointer ;
+    font-family: Arial, Helvetica, sans-serif;
     
 }
 p {
 color: white;
-margin-top: 15px;
+margin-top: 30px;
 font-weight: 700;
 cursor : pointer ;
 text-decoration: ${props => props.hover ? 'underline' : 'none'};
+font-family: Arial, Helvetica, sans-serif;
 }
 `
