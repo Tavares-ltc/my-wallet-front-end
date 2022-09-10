@@ -1,10 +1,13 @@
 import styled from 'styled-components';
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
-export default function HomePage({ type, setUserName }) {
+import axios from 'axios';
+
+export default function HomePage({ type, setUserName, setAuthorization }) {
     const [loginData, setLoginData] = useState({ email: '', password: '' })
-    const [signUpData, setSignUpData] = useState({name:'', email: '', password: ''})
-    const [hover, setHover] = useState(false)
+    const [signUpData, setSignUpData] = useState({ name: '', email: '', password: '' })
+    const [hover, setHover] = useState(false);
+    const [passowrdValidationText, setPasswordValidationText] = useState('')
     const navigate = useNavigate()
 
     if (type === 'sign-in') {
@@ -14,8 +17,8 @@ export default function HomePage({ type, setUserName }) {
                 <h1 >My Wallet</h1>
                 <Forms onSubmit={sendData} hover={hover}>
                     <form >
-                        <input type='email' placeholder='E-mail' name='email' onChange={handleLogin} required />
-                        <input type='password' placeholder='Senha' name='password' onChange={handleLogin} required />
+                        <input type='email' value={loginData.email} placeholder='E-mail' name='email' onChange={handleLogin} required />
+                        <input type='password' value={loginData.password} placeholder='Senha' name='password' onChange={handleLogin} required />
                         <button type='submit' value='entrar'> Entrar</button>
                     </form>
                     <p onMouseOver={() => setHover(!hover)}
@@ -31,10 +34,11 @@ export default function HomePage({ type, setUserName }) {
             <h1 >My Wallet</h1>
             <Forms onSubmit={sendData} hover={hover}>
                 <form >
-                    <input type='text' placeholder='Nome' name='name'onChange={handleSignUp} required/>
+                    <input type='text' placeholder='Nome' name='name' onChange={handleSignUp} required />
                     <input type='email' placeholder='E-mail' name='email' onChange={handleSignUp} required />
                     <input type='password' placeholder='Senha' name='password' onChange={handleSignUp} required />
-                    <input type='password' placeholder='Confirme a senha' name='password' onChange={handleSignUp} required />
+                    <input type='password' placeholder='Confirme a senha' name='password_confirm' onChange={handleSignUp} required />
+                    <p>{passowrdValidationText}</p>
                     <button type='submit' value='entrar'> Entrar </button>
                 </form>
                 <p onMouseOver={() => setHover(!hover)}
@@ -45,29 +49,54 @@ export default function HomePage({ type, setUserName }) {
     )
     function sendData(event) {
         event.preventDefault();
-        if(type === 'sign-in') {
-         console.log(loginData)
-         setUserName(loginData.name)
-        //    navigate('/mywallet')
-    } else {
+        if (type === 'sign-in') {
+            console.log(loginData)
+            axios.post("http://localhost:5000/sign-in", loginData).then((res)=> {
+                setAuthorization({
+                    headers: {
+                        'authorization': `Bearer ${res.data.token}`
+                    }
+                })
+                setUserName(res.data.name)
+                navigate('/mywallet')
+            }).catch((err)=> {
+                alert('Verifique o email e a senha.');
+                console.log(err);
+            })
+        } else {
             //verificar se as senhas são iguais
-            console.log(signUpData)
+            if (signUpData.password !== signUpData.password_confirm) {
+                setPasswordValidationText('As senhas devem ser iguais.')
+                return;
+            }
+            setPasswordValidationText('');
+            delete signUpData.password_confirm
+
+            axios.post("http://localhost:5000/sign-up", signUpData).then(()=> {
+                alert('Usuário criado com sucesso!');
+             navigate('/')
+            }).catch(err => {
+                console.error(err);
+                alert("Erro ao fazer cadastro! Consulte os logs.");
+            });
         }
+
     }
 
-    function handleSignUp (event) {
-        setSignUpData({
-            ...signUpData,
-            [event.target.name]: event.target.value
-        })
-    }
 
-    function handleLogin(event) {
-        setLoginData({
-            ...loginData,
-            [event.target.name]: event.target.value
-        })
-    }
+function handleSignUp(event) {
+    setSignUpData({
+        ...signUpData,
+        [event.target.name]: event.target.value
+    })
+}
+
+function handleLogin(event) {
+    setLoginData({
+        ...loginData,
+        [event.target.name]: event.target.value
+    })
+}
 
 }
 
@@ -113,6 +142,10 @@ input{
     &:focus{
  outline: 2px solid #21bb57; 
     }
+}
+form>p{
+    margin-top: 0;
+    color: #ff4848ff;
 }
 button {    
     margin-top: 20px;
