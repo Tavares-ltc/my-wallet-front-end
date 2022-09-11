@@ -9,8 +9,6 @@ import axios from "axios";
 export default function App() {
     const [userName, setUserName] = useState('')
     const [authorization, setAuthorization] = useState('')
-    const [error, setError] = useState('')
-
 
     useEffect(() => {
         const storedToken = localStorage.getItem("authorization")
@@ -29,7 +27,9 @@ export default function App() {
         if (authorization !== token) {
             setAuthorization(token)
         }
-    }, [error])
+    }, [])
+
+
 
     return (
         <>
@@ -37,11 +37,11 @@ export default function App() {
 
             <BrowserRouter>
                 <Routes>
-                    <Route path='/' element={<HomePage type={'sign-in'} setUserName={setUserName} authorization={authorization} setAuthorization={setAuthorization}/>} />
+                    <Route path='/' element={<HomePage type={'sign-in'} setUserName={setUserName} authorization={authorization} setAuthorization={setAuthorization} />} />
                     <Route path='/cadastro' element={<HomePage type={'sign-up'} />} />
-                    <Route path='/mywallet' element={<MyWallet userName={userName} authorization={authorization} />} />
-                    <Route path='/entrada' element={<CashFlow type={'in'} authorization={authorization} setError={setError} />} />
-                    <Route path='/saida' element={<CashFlow type={'out'} authorization={authorization} setError={setError} />} />
+                    <Route path='/mywallet' element={<MyWallet userName={userName} authorization={authorization} setAuthorization={setAuthorization} />} />
+                    <Route path='/entrada' element={<CashFlow type={'in'} authorization={authorization} />} />
+                    <Route path='/saida' element={<CashFlow type={'out'} authorization={authorization} />} />
 
                 </Routes>
             </BrowserRouter>

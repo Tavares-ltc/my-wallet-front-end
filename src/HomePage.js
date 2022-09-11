@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -10,9 +10,13 @@ export default function HomePage({ type, setUserName, authorization, setAuthoriz
     const [passowrdValidationText, setPasswordValidationText] = useState('')
     const navigate = useNavigate()
 
-    if(type=== 'sign-in' && authorization) {
+
+useEffect(()=>{
+    if(type === 'sign-in' && authorization) {
         navigate('/mywallet')
     }
+}, [])
+    
 
     if (type === 'sign-in') {
 
@@ -62,9 +66,9 @@ export default function HomePage({ type, setUserName, authorization, setAuthoriz
                     }
                 })
                 localStorage.setItem("authorization", JSON.stringify(token));
-                setAuthorization(token)
 
                 setUserName(res.data.name)
+                setAuthorization(token)
                 navigate('/mywallet')
             }).catch((err) => {
                 alert('Verifique o email e a senha.');

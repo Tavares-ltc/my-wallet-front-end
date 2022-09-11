@@ -4,7 +4,7 @@ import styled from "styled-components"
 import { Page, Header } from "./MyWallet"
 import axios from 'axios';
 
-export default function CashFlow({ type, authorization, setError }) {
+export default function CashFlow({ type, authorization }) {
     const [cashFlowData, setCashFlowData] = useState({ value: '', description: '' })
     const [flowType, setFlowType] = useState('entrada')
     const navigate = useNavigate()
@@ -15,13 +15,6 @@ export default function CashFlow({ type, authorization, setError }) {
             setFlowType('entrada')
         }
     }, [type])
-    
-    // useEffect(() => {
-    //     if (!authorization) {
-    //         alert('Sua sessão expirou.')
-    //         navigate('/')
-    //     }
-    // }, [cashFlowData])
 
     
     return (
@@ -51,7 +44,6 @@ export default function CashFlow({ type, authorization, setError }) {
             axios.post(`http://localhost:5000/${(type === 'out')? 'cash-out':'cash-in'}`, cashFlowData, authorization)
             .then(() => setCashFlowData({ value: '', description: '' }))
             .catch((err) => {
-                setError(err);
                 if(err.response.status === 401) {
                     localStorage.removeItem('authorization')
                     alert('Sua sessão expirou.')
