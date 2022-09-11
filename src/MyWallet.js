@@ -4,9 +4,9 @@ import axios from 'axios';
 
 export default function MyWallet({ userName, authorization },) {
     const navigate = useNavigate()
-    console.log(authorization)
-if(!authorization){
-    return (
+    if(!authorization){
+        
+        return (
         <Page>
             <Header>
                 <h1>Olá, tente fazer login.</h1>
@@ -29,11 +29,13 @@ if(!authorization){
     )
 }
 listCashflow()
-    return (
-        <Page>
+return (
+    <Page>
             <Header>
                 <h1>Olá, {userName}</h1>
-                <ion-icon name="log-out-outline" onClick={()=> navigate('/')}></ion-icon>
+                <ion-icon name="log-out-outline" onClick={()=> {
+                    localStorage.removeItem("authorization")
+                    navigate('/')}}></ion-icon>
             </Header>
             <BalancePage>
 

@@ -3,12 +3,16 @@ import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-export default function HomePage({ type, setUserName, setAuthorization }) {
+export default function HomePage({ type, setUserName, authorization, setAuthorization}) {
     const [loginData, setLoginData] = useState({ email: '', password: '' })
     const [signUpData, setSignUpData] = useState({ name: '', email: '', password: '' })
     const [hover, setHover] = useState(false);
     const [passowrdValidationText, setPasswordValidationText] = useState('')
     const navigate = useNavigate()
+
+    if(type=== 'sign-in' && authorization) {
+        navigate('/mywallet')
+    }
 
     if (type === 'sign-in') {
 
@@ -51,15 +55,18 @@ export default function HomePage({ type, setUserName, setAuthorization }) {
         event.preventDefault();
         if (type === 'sign-in') {
             console.log(loginData)
-            axios.post("http://localhost:5000/sign-in", loginData).then((res)=> {
-                setAuthorization({
+            axios.post("http://localhost:5000/sign-in", loginData).then((res) => {
+                const token = ({
                     headers: {
                         'authorization': `Bearer ${res.data.token}`
                     }
                 })
+                localStorage.setItem("authorization", JSON.stringify(token));
+                setAuthorization(token)
+
                 setUserName(res.data.name)
                 navigate('/mywallet')
-            }).catch((err)=> {
+            }).catch((err) => {
                 alert('Verifique o email e a senha.');
                 console.log(err);
             })
@@ -72,9 +79,9 @@ export default function HomePage({ type, setUserName, setAuthorization }) {
             setPasswordValidationText('');
             delete signUpData.password_confirm
 
-            axios.post("http://localhost:5000/sign-up", signUpData).then(()=> {
+            axios.post("http://localhost:5000/sign-up", signUpData).then(() => {
                 alert('Usuário criado com sucesso!');
-             navigate('/')
+                navigate('/')
             }).catch(err => {
                 console.error(err);
                 alert("Erro ao fazer cadastro! Consulte os logs.");
@@ -84,19 +91,19 @@ export default function HomePage({ type, setUserName, setAuthorization }) {
     }
 
 
-function handleSignUp(event) {
-    setSignUpData({
-        ...signUpData,
-        [event.target.name]: event.target.value
-    })
-}
+    function handleSignUp(event) {
+        setSignUpData({
+            ...signUpData,
+            [event.target.name]: event.target.value
+        })
+    }
 
-function handleLogin(event) {
-    setLoginData({
-        ...loginData,
-        [event.target.name]: event.target.value
-    })
-}
+    function handleLogin(event) {
+        setLoginData({
+            ...loginData,
+            [event.target.name]: event.target.value
+        })
+    }
 
 }
 

@@ -2,8 +2,9 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import { Page, Header } from "./MyWallet"
+import axios from 'axios';
 
-export default function CashFlow({ type }) {
+export default function CashFlow({ type, authorization, setError }) {
     const [cashFlowData, setCashFlowData] = useState({ value: '', description: '' })
     const [flowType, setFlowType] = useState('entrada')
     const navigate = useNavigate()
@@ -14,7 +15,15 @@ export default function CashFlow({ type }) {
             setFlowType('entrada')
         }
     }, [type])
+    
+    // useEffect(() => {
+    //     if (!authorization) {
+    //         alert('Sua sessão expirou.')
+    //         navigate('/')
+    //     }
+    // }, [cashFlowData])
 
+    
     return (
         <Page>
             <Header>
@@ -23,14 +32,13 @@ export default function CashFlow({ type }) {
             </Header>
             <Forms onSubmit={sendData}>
                 <form >
-                    <input type='number' pattern="/[0-9]/" min="0" placeholder='Valor' name='value' onChange={handleCashFlowData} required />
-                    <input type='text' placeholder='Descrição' name='description' onChange={handleCashFlowData} required />
+                    <input type='number' value={cashFlowData.value} pattern="/[0-9]/" min="0" placeholder='Valor' name='value' onChange={handleCashFlowData} required />
+                    <input type='text' value={cashFlowData.description} placeholder='Descrição' name='description' onChange={handleCashFlowData} required />
                     <button type='submit' value='entrar'> Salvar {flowType}</button>
                 </form>
             </Forms>
         </Page>
     )
-
     function handleCashFlowData(event) {
         setCashFlowData({
             ...cashFlowData,
@@ -39,11 +47,19 @@ export default function CashFlow({ type }) {
     }
     function sendData(event) {
         event.preventDefault();
-        if (type === 'in') {
-
-            return console.log(cashFlowData)
-        }
-        console.log(cashFlowData)
+        
+            axios.post(`http://localhost:5000/${(type === 'out')? 'cash-out':'cash-in'}`, cashFlowData, authorization)
+            .then(() => setCashFlowData({ value: '', description: '' }))
+            .catch((err) => {
+                setError(err);
+                if(err.response.status === 401) {
+                    localStorage.removeItem('authorization')
+                    alert('Sua sessão expirou.')
+                    navigate('/')
+                } else {
+                    alert(err)
+                }
+            })
     }
 }
 
@@ -64,6 +80,7 @@ input{
     width: 100%;
     font-size: 15px;
     font-family: Arial, Helvetica, sans-serif;
+    //retirando setas dos inputs type number:
 /* Chrome, Safari, Edge, Opera */
 &::-webkit-outer-spin-button,
 &::-webkit-inner-spin-button {
