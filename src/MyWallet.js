@@ -7,6 +7,7 @@ export default function MyWallet({ userName, setAuthorization, authorization },)
     const navigate = useNavigate()
     const [cashflowList, setCashFlowList] = useState([])
     const token = JSON.parse(localStorage.getItem('authorization'))
+    const [balance, setBalance] = useState(0)
     useEffect(() => {
         axios.get("http://localhost:5000/cashflow", token)
             .then((res) => {
@@ -18,6 +19,14 @@ export default function MyWallet({ userName, setAuthorization, authorization },)
                 console.log(res)
             })
 
+        axios.get("http://localhost:5000/balance", token)
+            .then((res) => {
+                const balanceData = (res.data.balance)
+                setBalance(balanceData)
+            })
+            .catch((res) => {
+                console.log(res)
+            })
     }, [])
 
 
@@ -62,7 +71,7 @@ export default function MyWallet({ userName, setAuthorization, authorization },)
                 <Transactions>
                     {cashflowList.map((iten) => <Transaction date={iten.date} value={iten.value} description={iten.description} type={iten.type} />)}
                 </Transactions>
-                <Balance></Balance>
+                <Balance balance={balance}></Balance>
             </BalancePage>
             <Botton>
                 <Button onClick={() => navigate('/entrada')}>
@@ -78,11 +87,11 @@ export default function MyWallet({ userName, setAuthorization, authorization },)
     )
 }
 
-function Balance() {
+function Balance({ balance }) {
     return (
         <BalanceWrappler>
-            <h7>Saldo:</h7>
-            <h8>123</h8>
+            <h5>Saldo:</h5>
+            {(balance > 0)? <h6>{balance}</h6> : <h6><strong>({balance})</strong></h6> }
         </BalanceWrappler>
     )
 }
@@ -106,6 +115,19 @@ const Transactions = styled.div`
 const BalanceWrappler = styled.div`
 display: flex;
 justify-content: space-between;
+h5 {
+    font-size: 18px;
+    color: black;
+    font-weight: 700;
+}
+h6 {
+    font-size: 14px;
+    color: #00d27d;
+    strong {
+        
+    color: red;
+    }
+}
 `
 const TransactionWrappler = styled.div`
 display: flex;

@@ -42,7 +42,6 @@ export default function App() {
                     <Route path='/mywallet' element={<MyWallet userName={userName} authorization={authorization} setAuthorization={setAuthorization} />} />
                     <Route path='/entrada' element={<CashFlow type={'in'} authorization={authorization} />} />
                     <Route path='/saida' element={<CashFlow type={'out'} authorization={authorization} />} />
-
                 </Routes>
             </BrowserRouter>
         </>
