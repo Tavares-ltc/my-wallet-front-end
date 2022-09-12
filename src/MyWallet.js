@@ -8,6 +8,7 @@ export default function MyWallet({ userName, setAuthorization, authorization },)
     const [cashflowList, setCashFlowList] = useState([])
     const token = JSON.parse(localStorage.getItem('authorization'))
     const [balance, setBalance] = useState(0)
+    const [lastChange, setLastChange] = useState('')
     useEffect(() => {
         axios.get("http://localhost:5000/cashflow", token)
             .then((res) => {
@@ -27,7 +28,7 @@ export default function MyWallet({ userName, setAuthorization, authorization },)
             .catch((res) => {
                 console.log(res)
             })
-    }, [])
+    }, [lastChange])
 
 
     if (!token) {
@@ -72,7 +73,7 @@ export default function MyWallet({ userName, setAuthorization, authorization },)
                     <h2>Não há registros de entrada ou saída.</h2>
                 </Modal>)
                 : (<Transactions>
-                    {cashflowList.map((iten) => <Transaction date={iten.date} value={iten.value} description={iten.description} type={iten.type} />)}
+                    {cashflowList.map((item) => <Transaction setLastChange={setLastChange} token={token} date={item.date} value={item.value} description={item.description} type={item.type} id={item._id} />)}
                 </Transactions>)
             }
                 <Balance balance={balance}></Balance>
@@ -96,17 +97,35 @@ function Balance({ balance }) {
         <BalanceWrappler>
             <h5>Saldo:</h5>
             {(balance > 0) ? <h6>{balance}</h6> : <h6><strong>({balance})</strong></h6>}
+
         </BalanceWrappler>
     )
 }
 
-function Transaction({ date, value, description, type }) {
+function Transaction({ date, value, description, type, id, token, setLastChange }) {
     console.log(date)
+
+    const authorization = token.headers.authorization
     return (
 
         <TransactionWrappler>
             <h4>{date} <strong>{description}</strong></h4>
-            {(type === 'positive') ? <h5>{value}</h5> : <h6>{value}</h6>}
+            <ValueWrappler>
+                {(type === 'positive') ? <h5>{value}</h5> : <h6>{value}</h6>}
+                <ion-icon name="close-outline" onClick={() => {
+                    axios.delete("http://localhost:5000/cashflow", {
+                        headers: {
+                            Authorization: authorization
+                        },
+                        data: {
+                            id: id
+                        }
+                    })
+                        .then(() => setLastChange(id))
+                        .catch(() => console.log('Algo saiu errado, tente novamente mais tarde.'))
+                }}></ion-icon>
+            </ValueWrappler>
+
         </TransactionWrappler>
 
     )
@@ -119,7 +138,9 @@ h2 {
     font-family: Arial, Helvetica, sans-serif;
 }
 `
-
+const ValueWrappler = styled.div`
+display: flex;
+`
 const Transactions = styled.div`
 
 
