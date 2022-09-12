@@ -67,10 +67,14 @@ export default function MyWallet({ userName, setAuthorization, authorization },)
                 }}>
                 </ion-icon>
             </Header>
-            <BalancePage>
-                <Transactions>
+            <BalancePage>{(cashflowList.length === 0) ?
+                (<Modal>
+                    <h2>Não há registros de entrada ou saída.</h2>
+                </Modal>)
+                : (<Transactions>
                     {cashflowList.map((iten) => <Transaction date={iten.date} value={iten.value} description={iten.description} type={iten.type} />)}
-                </Transactions>
+                </Transactions>)
+            }
                 <Balance balance={balance}></Balance>
             </BalancePage>
             <Botton>
@@ -91,7 +95,7 @@ function Balance({ balance }) {
     return (
         <BalanceWrappler>
             <h5>Saldo:</h5>
-            {(balance > 0)? <h6>{balance}</h6> : <h6><strong>({balance})</strong></h6> }
+            {(balance > 0) ? <h6>{balance}</h6> : <h6><strong>({balance})</strong></h6>}
         </BalanceWrappler>
     )
 }
@@ -107,6 +111,14 @@ function Transaction({ date, value, description, type }) {
 
     )
 }
+const Modal = styled.div`
+margin: auto auto;
+h2 {
+    font-size: 16px;
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+}
+`
 
 const Transactions = styled.div`
 
@@ -121,7 +133,8 @@ h5 {
     font-weight: 700;
 }
 h6 {
-    font-size: 14px;
+    font-size: 17px;
+    font-weight: 700;
     color: #00d27d;
     strong {
         
@@ -139,6 +152,7 @@ h4{
     h5{
         color: #00d27d;
         font-family: Arial, Helvetica, sans-serif;
+
     }
     h6{
         color: red;

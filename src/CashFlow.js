@@ -25,8 +25,8 @@ export default function CashFlow({ type, authorization }) {
             </Header>
             <Forms onSubmit={sendData}>
                 <form >
-                    <input type='number' value={cashFlowData.value} pattern="/[0-9]/" min="0" placeholder='Valor' name='value' onChange={handleCashFlowData} required />
-                    <input type='text' value={cashFlowData.description} placeholder='Descrição' name='description' onChange={handleCashFlowData} required />
+                    <input type='number' maxlength="6" value={cashFlowData.value} pattern="/[0-9]/" min="0" placeholder='Valor' name='value' onChange={handleCashFlowData} required />
+                    <input type='text' maxlength="25" value={cashFlowData.description} placeholder='Descrição' name='description' onChange={handleCashFlowData} required />
                     <button type='submit' value='entrar'> Salvar {flowType}</button>
                 </form>
             </Forms>
